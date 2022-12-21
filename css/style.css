@@ -1,0 +1,74 @@
+@import url("//fonts.googleapis.com/icon?family=Material+Icons");
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    color: #cf4520;
+}
+
+#container {
+    min-width: max-content;
+}
+
+nav {
+    overflow: hidden;
+    width: 100%;
+    height: 50px;
+    position: fixed;
+    background-color: #cf4520;
+    text-align: right;
+    top: 0;
+    left: 0;
+    color: white;
+    padding-top: 30px;
+    min-width: max-content;
+}
+
+nav a {
+    text-decoration: none;
+    padding: 16px;
+    color: white;
+}
+
+#search {
+    min-width: max-content;
+    text-align: center;
+    padding-top: 100px;
+}
+
+#title {
+    padding-bottom: 24px;
+    font-weight: bolder;
+}
+
+#input {
+    font-weight: bolder;
+}
+
+#input i {
+    position: absolute;
+    height: 24px;
+    padding-top: 6px;
+    padding-left: 16px;
+}
+
+#input input {
+    padding: 4px;
+    border-radius: 24px;
+    border: 2px solid #cf4520;
+}
+
+#input input[type=text] {
+    width: 370px;
+    margin: 0 8px;
+    padding-left: 32px;
+    height: 24px;
+    color: #cf4520 !important;
+}
+
+#input input[type=submit] {
+    width: 130px;
+    background-color: #cf4520;
+    font-weight: bold;
+    height: 36px;
+    color: white;
+}
