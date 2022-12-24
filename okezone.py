@@ -15,7 +15,7 @@ newsList = []
 
 for new in news:
     ozTitle = new.find_element(By.XPATH, './/div[@class="explan"]/div[@class="title"]/a')
-    ozDate = new.find_element(By.XPATH, './/div[@class="explan"]/div[@class="tgl"]')
+    ozDate = new.find_element(By.CLASS_NAME, 'tgl')
     ozCategory = new.find_element(By.CLASS_NAME, 'kanal')
     if (ozTitle.text != '' or ozDate.text != '' or ozCategory.text != ''):
         newsList.append([ozTitle.text, ozDate.text, ozCategory.text])

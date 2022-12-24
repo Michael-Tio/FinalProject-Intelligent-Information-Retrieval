@@ -54,17 +54,17 @@
                         $stopword = $stopwordFactory->createStopWordRemover();
 
                         // CRAWL OKEZONE
-                        $commandOkezone = "python okezone.py " . $keyOkezone;
-                        $outputOkezone = shell_exec($commandOkezone);
-                        $resultOkezone = json_decode($outputOkezone, true);
+                        // $commandOkezone = "python okezone.py " . $keyOkezone;
+                        // $outputOkezone = shell_exec($commandOkezone);
+                        // $resultOkezone = json_decode($outputOkezone, true);
 
-                        foreach ((array)$resultOkezone as $data) {
-                            echo "<tr>";
-                            echo "<td>$data[0]</td>";
-                            echo "<td>$data[1]</td>";
-                            echo "<td>$data[2]</td>";
-                            echo "<tr>";
-                        }
+                        // foreach ((array)$resultOkezone as $data) {
+                        //     echo "<tr>";
+                        //     echo "<td>$data[0]</td>";
+                        //     echo "<td>$data[1]</td>";
+                        //     echo "<td>$data[2]</td>";
+                        //     echo "<tr>";
+                        // }
 
                         // CRAWL CNN
                         // $commandCNN = "python cnn.py " . $keyCNN;
@@ -78,12 +78,25 @@
                         //     echo "<td>$data[2]</td>";
                         //     echo "<tr>";
                         // }
-                        $html = file_get_html("https://www.cnnindonesia.com/search/?query=" . $keyCNN);
+
+                        $curl = curl_init();
+                        curl_setopt($curl, CURLOPT_URL, "https://www.cnnindonesia.com/search/?query=" . $keyCNN);
+                        curl_setopt($curl, CURLOPT_FOLLOWLOCATION, true); // so Google won't redirect
+                        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+                        curl_setopt($curl, CURLOPT_HEADER, false);
+                        $url = curl_exec($curl);
+                        curl_close($curl);
+
+                        $html = new simple_html_dom();
+                        $html->load($url);
+
+                        // $html = file_get_html("https://www.cnnindonesia.com/search/?query=" . $keyCNN);
+                        // $html = file_get_html('https://www.cnnindonesia.com/');
 
                         foreach ($html->find('article') as $berita) {
-                            $cnnTitle = $berita->find('h2[class="title"]', 0)->plaintext;
-                            $cnnDate = $berita->find('span[class="date"]', 0)->plaintext;
-                            $cnnCategory = $berita->find('span[class="kanal"]', 0)->plaintext;
+                            $cnnTitle = $berita->find('h2[class="title"]', 0)->innertext;
+                            $cnnDate = $berita->find('a', 0)->find('span[class="box_text"]', 0)->find('span[class="date"]', 0)->plaintext;
+                            $cnnCategory = $berita->find('a', 0)->find('span[class="box_text"]', 0)->find('span[class="kanal"]', 0)->innertext;
 
                             echo "<tr>";
                             echo "<td>$cnnTitle</td>";
