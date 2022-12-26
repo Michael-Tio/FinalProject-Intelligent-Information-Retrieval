@@ -97,7 +97,6 @@
                                 echo "<tr>";
                             }
                         }
-
                     } else {
                         echo "eror";
                     }
