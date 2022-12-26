@@ -14,12 +14,12 @@
         <nav>
             <a href="index.php" class="active">Home</a> |
             <a href="crawl.php">Crawling</a> |
-            <a href="">Classification</a> |
+            <a href="classification.php">Classification</a> |
             <a href="">Evaluation</a>
         </nav>
         <section id="search">
             <div id="title">
-                <h1>Welcome to Berita Lambe Turah</h1>
+                <h1>Welcome to Berita Lambe Turah</h1> 
             </div>
             <div id="input">
                 <form action="" method="post">

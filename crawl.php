@@ -54,6 +54,7 @@
                         echo "</thead><tbody>";
 
                         $keyOkezone = str_replace(" ", "%20", $_POST["keyword"]);
+                        print($keyOkezone);
                         $keyCNN = str_replace(" ", "+", $_POST['keyword']);
 
                         $stemmerFactory = new \Sastrawi\Stemmer\StemmerFactory();
