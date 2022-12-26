@@ -29,6 +29,12 @@ nav a {
     color: white;
 }
 
+nav a.active {
+    font-weight: bolder;
+    text-underline-offset: 5px;
+    text-decoration: underline;
+}
+
 #search {
     min-width: max-content;
     text-align: center;

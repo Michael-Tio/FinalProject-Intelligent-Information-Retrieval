@@ -13,7 +13,7 @@
     <div id="container">
         <nav>
             <a href="index.php">Home</a> |
-            <a href="crawl.php">Crawling</a> |
+            <a href="crawl.php" class="active">Crawling</a> |
             <a href="">Classification</a> |
             <a href="">Evaluation</a>
         </nav>
@@ -36,6 +36,18 @@
                     require_once __DIR__ . '/vendor/autoload.php';
                     include_once('simple_html_dom.php');
 
+                    function setCURL ($url) {
+                        $curl = curl_init();
+                        curl_setopt($curl, CURLOPT_URL, $url);
+                        curl_setopt($curl, CURLOPT_FOLLOWLOCATION, true);
+                        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+                        curl_setopt($curl, CURLOPT_HEADER, false);
+                        $c_url = curl_exec($curl);
+                        curl_close($curl);
+
+                        return $c_url;
+                    }
+
                     if (isset($_POST['crawl'])) {
                         echo "<thead style='font-weight: bold;'>";
                         echo "<tr><td>Title</td><td>Date</td><td>Category</td></tr>";
@@ -50,17 +62,17 @@
                         $stopword = $stopwordFactory->createStopWordRemover();
 
                         // CRAWL OKEZONE
-                        $commandOkezone = "python okezone.py " . $keyOkezone;
-                        $outputOkezone = shell_exec($commandOkezone);
-                        $resultOkezone = json_decode($outputOkezone, true);
+                        // $commandOkezone = "python okezone.py " . $keyOkezone;
+                        // $outputOkezone = shell_exec($commandOkezone);
+                        // $resultOkezone = json_decode($outputOkezone, true);
 
-                        foreach ((array)$resultOkezone as $data) {
-                            echo "<tr>";
-                            echo "<td>$data[0]</td>";
-                            echo "<td>$data[1]</td>";
-                            echo "<td>$data[2]</td>";
-                            echo "<tr>";
-                        }
+                        // foreach ((array)$resultOkezone as $data) {
+                        //     echo "<tr>";
+                        //     echo "<td>$data[0]</td>";
+                        //     echo "<td>$data[1]</td>";
+                        //     echo "<td>$data[2]</td>";
+                        //     echo "<tr>";
+                        // }
 
                         // CRAWL CNN
 
@@ -103,22 +115,51 @@
                         //     echo "<tr>";
                         // }
                         
-                        $curl = curl_init();
-                        curl_setopt($curl, CURLOPT_URL, "https://www.google.com/search?q=cnnindonesia.com+$keyCNN");
-                        curl_setopt($curl, CURLOPT_FOLLOWLOCATION, true); // so Google won't redirect
-                        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-                        curl_setopt($curl, CURLOPT_HEADER, false);
-                        // curl_setopt($curl, CURLOPT_USERAGENT, 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.1.1) Gecko/20061204 Firefox/2.0.0.1');
-                        $url = curl_exec($curl);
-                        curl_close($curl);
+                        // $curl = curl_init();
+                        // curl_setopt($curl, CURLOPT_URL, "https://www.google.com/search?q=cnnindonesia.com+$keyCNN");
+                        // curl_setopt($curl, CURLOPT_FOLLOWLOCATION, true); // so Google won't redirect
+                        // curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+                        // curl_setopt($curl, CURLOPT_HEADER, false);
+                        // $url = curl_exec($curl);
+                        // curl_close($curl);
 
-                        $html = new simple_html_dom();
-                        $html->load($url);
+                        // $html1 = file_get_html("https://www.google.com/search?q=cnnindonesia.com+$keyCNN");
+                        $html1 = setCURL("https://www.google.com/search?q=cnnindonesia.com+$keyCNN");
+                        $dom1 = new simple_html_dom();
+                        $dom1->load($html1);
 
-                        echo "https://www.google.com/search?q=cnnindonesia.com+$keyCNN<br>";
-                        foreach ($html->find("a[href^=/url?]") as $link) {
-                            if (!empty($link->plaintext)) {
-                                echo $link->plaintext . "<br>";
+                        foreach ($dom1->find("a[href^=/url?]") as $search) {
+                            if (!empty($search->plaintext)) {
+                                if (strpos($search->href, "cnnindonesia.com/tag/") !== false or strpos($search->href, "google.com") !== false) {
+                                    continue;
+                                } else {
+                                    $cnnLink = substr($search->href, 7);
+                                    // echo $cnnLink . "<br>";
+                                    // $html = file_get_html($cnnLink);
+                                    $html = setCURL($cnnLink);
+                                    $news = new simple_html_dom();
+                                    $news->load($html);
+                                    $cnnArticle = $news->find("a", 0)->href;
+
+                                    // $html2 = file_get_html($cnnArticle);
+                                    $html2 = setCURL($cnnArticle);
+                                    $new = new simple_html_dom();
+                                    $new->load($html2);
+
+                                    $cnnTitle = $new->find("h1[class='title']", 0)->innertext;
+                                    echo $cnnTitle . "<br>";
+
+                                    // if($news->find('h1[class="title"]',0)->innertext)
+									// {
+									// 	$title = $news->find('h1[class="title"]',0)->innertext;
+                                    //     echo $title . "<br>";
+									// }
+									// else{
+									// 	continue;
+									// }
+
+                                    // echo $news . "<br>";
+                                }
                             }
                         }
                     }
