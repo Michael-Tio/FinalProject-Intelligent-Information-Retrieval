@@ -55,6 +55,8 @@
                     $con = mysqli_connect("localhost" ,"root" ,"","news");
                     $sql_select = "SELECT title,clean_data FROM contents";
                     $result = mysqli_query($con,$sql_select);
+
+                    $con = "";
                 
                     if (mysqli_num_rows($result)>0) {
                     $outputStem = $stemmer->stem($_POST["keyword"]);
