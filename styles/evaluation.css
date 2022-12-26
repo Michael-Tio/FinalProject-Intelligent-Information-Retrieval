@@ -1,0 +1,82 @@
+*{
+    margin: 0;
+    padding: 0;
+}
+body{
+    background-color: aliceblue;
+}
+
+header{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: #678983;
+    color: #181D31;
+}
+header .header-title{
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
+.navbar{
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    background-color: #E6DDC4;
+    height: 5vh;
+}
+.nav-item{
+    padding-left: 10px;
+    padding-right: 10px;
+
+    display: inline-flex;
+    align-items: center;
+
+    text-decoration: none;
+    color: black;
+}
+.nav-item:hover{
+    cursor: pointer;
+    background-color: #d6ceb6;
+}
+
+form{
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+}
+
+.search{
+    display: flex;
+    flex-direction: row;
+    column-gap: 10px;
+    align-items: center;
+}
+.search-textbox{
+    background-color: white;
+    border: 1px solid black;
+    display: flex;
+    align-items: center;
+    column-gap: 10px;
+    padding: 0px 0px 0px 5px;
+}
+.search-text{
+    background-color: transparent;
+    border: none;
+    height: 30px;
+    width: 300px;
+}
+.search-text:focus{
+    outline: none;
+}
+.search-submit{
+    padding: 5px 15px 5px 15px;
+}
+.search-submit:hover{
+    cursor: pointer;
+}
