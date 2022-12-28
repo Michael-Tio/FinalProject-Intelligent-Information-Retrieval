@@ -10,7 +10,7 @@ from selenium.webdriver.support import expected_conditions as EC
 
 # keyCNN = sys.argv[1]
 
-path = 'C:/Users/ASUS/Downloads/INSTALLER/chromedriver'
+path = 'https://unpkg.com/chromedriver@108.0.0/lib/chromedriver.js'
 driver = webdriver.Chrome(executable_path = path)
 driver.get('https://www.cnnindonesia.com/search/?query=niall+horan')
 # driver.implicitly_wait(15)

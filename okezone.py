@@ -5,7 +5,7 @@ import json
 
 keyOkezone = sys.argv[1]
 
-path = 'C:/Users/62821/Chromedriver/chromedriver'
+path = 'https://unpkg.com/chromedriver@108.0.0/lib/chromedriver.js'
 driver = webdriver.Chrome(executable_path = path)
 driver.get('https://search.okezone.com/search?q=' + keyOkezone + '&highlight=1&sort=desc&start=0')
 

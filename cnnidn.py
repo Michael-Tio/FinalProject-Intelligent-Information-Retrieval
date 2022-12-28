@@ -11,7 +11,7 @@ from selenium.webdriver.support import expected_conditions as EC
 
 keyCNN = sys.argv[1]
 
-path = 'C:/Users/62821/Chromedriver/chromedriver'
+path = 'https://unpkg.com/chromedriver@108.0.0/lib/chromedriver.js'
 options = webdriver.ChromeOptions()
 options.add_experimental_option('excludeSwitches', ['enable-logging'])
 driver = webdriver.Chrome(executable_path = path, options = options, service = Service(ChromeDriverManager().install()))
