@@ -139,8 +139,8 @@
                         $classifier->train($sample_data, $category);
                         $classfication = $classifier->predict($new_data);
 
-                        // $sql = "INSERT INTO `testing`(`title`, `date`, `original_category`, `classification`) VALUES ('" . $data[0] . "','" . $data[1] . "','" . $data[2] . "','" . $classfication . "')";
-                        // mysqli_query($con, $sql);
+                        $sql = "INSERT INTO `testing`(`title`, `date`, `original_category`, `classification`) VALUES ('" . $data[0] . "','" . $data[1] . "','" . $data[2] . "','" . $classfication . "')";
+                        mysqli_query($con, $sql);
 
                         $sample_data = $data_train;
 
