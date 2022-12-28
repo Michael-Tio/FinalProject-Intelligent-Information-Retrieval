@@ -31,8 +31,7 @@
                 </form>
             </div>
         </section>
-        <section>
-            <table>
+        <section id="result">
                 <?php
                 require_once __DIR__ . '/vendor/autoload.php';
                 include_once('simple_html_dom.php');
@@ -51,8 +50,10 @@
                 }
 
                 if (isset($_POST['crawl'])) {
-                    echo "<thead style='font-weight: bold;'>";
-                    echo "<tr><td>Title</td><td>Date</td><td>Category</td></tr>";
+                    echo "<div id='title'><h3>Crawled Data for '" . $_POST['keyword'] . "'</h3></div>";
+
+                    echo "<table><thead>";
+                    echo "<tr><th>Title</th><th>Date</th><th>Category</th></tr>";
                     echo "</thead><tbody>";
 
                     $keyOkezone = str_replace(" ", "%20", $_POST["keyword"]);
@@ -64,31 +65,30 @@
                     $stopword = $stopwordFactory->createStopWordRemover();
 
                     // CRAWL OKEZONE
-                    // $commandOkezone = "python okezone.py " . $keyOkezone;
-                    // $outputOkezone = shell_exec($commandOkezone);
-                    // $resultOkezone = json_decode($outputOkezone, true);
+                    $commandOkezone = "python okezone.py " . $keyOkezone;
+                    $outputOkezone = shell_exec($commandOkezone);
+                    $resultOkezone = json_decode($outputOkezone, true);
                 
-                    // foreach ((array)$resultOkezone as $data) {
-                    //     echo "<tr>";
-                    //     echo "<td>$data[0]</td>";
-                    //     echo "<td>$data[1]</td>";
-                    //     echo "<td>$data[2]</td>";
-                    //     echo "<tr>";
-                    // }
+                    foreach ((array)$resultOkezone as $data) {
+                        echo "<tr>";
+                        echo "<td>$data[0]</td>";
+                        echo "<td>$data[1]</td>";
+                        echo "<td>$data[2]</td>";
+                        echo "<tr>";
+                    }
                 
                     // CRAWL CNN
+                    $commandCNN = "python cnnidn.py " . $keyCNN;
+                    $outputCNN = shell_exec($commandCNN);
+                    $resultCNN = json_decode($outputCNN, true);
                 
-                    // SELENIUM
-                    // $commandCNN = "python cnn.py " . $keyCNN;
-                    // $outputCNN = shell_exec($commandCNN);
-                    // $resultCNN = json_decode($outputCNN, true);
-                    // foreach ((array)$resultCNN as $data) {
-                    //     echo "<tr>";
-                    //     echo "<td>$data[0]</td>";
-                    //     echo "<td>$data[1]</td>";
-                    //     echo "<td>$data[2]</td>";
-                    //     echo "<tr>";
-                    // }
+                    foreach ((array)$resultCNN as $data) {
+                        echo "<tr>";
+                        echo "<td>$data[0]</td>";
+                        echo "<td>$data[1]</td>";
+                        echo "<td>$data[2]</td>";
+                        echo "<tr>";
+                    }
                 
                     // CURL
                     // $curl = curl_init();
@@ -126,91 +126,90 @@
                     // curl_close($curl);
                 
                     // $html1 = file_get_html("https://www.google.com/search?q=cnnindonesia.com+$keyCNN");
-                    $html1 = setCURL("https://www.google.com/search?q=cnnindonesia.com" . $keyCNN);
-                    $dom1 = new simple_html_dom();
-                    $dom2 = new simple_html_dom();
-                    $dom3 = new simple_html_dom();
-                    $dom1->load($html1);
+                    // $html1 = setCURL("https://www.google.com/search?q=cnnindonesia.com" . $keyCNN);
+                    // $dom1 = new simple_html_dom();
+                    // $dom2 = new simple_html_dom();
+                    // $dom3 = new simple_html_dom();
+                    // $dom1->load($html1);
 
-                    foreach ($dom1->find("a[href^=/url?]") as $search) {
-                        $link = $search->href;
-                        $content = file_get_html('https://www.google.com/' . $link);
-                        $dom2->load($content);
+                    // foreach ($dom1->find("a[href^=/url?]") as $search) {
+                    //     $link = $search->href;
+                    //     $content = file_get_html('https://www.google.com/' . $link);
+                    //     $dom2->load($content);
 
-                        $realLink = $dom2->find('a', 0)->href;
+                    //     $realLink = $dom2->find('a', 0)->href;
 
-                        $news = file_get_html($realLink);
-                        $dom3->load($news);
+                    //     $news = file_get_html($realLink);
+                    //     $dom3->load($news);
 
-                        if($dom3->find('h1[class="title"]',0)->innertext)
-                        {
-                            echo $title = $dom3->find('h1[class="title"]',0)->innertext;
-                            echo '<br>';
-                        }
-                        else{
-                            continue;
-                        }
+                    //     if($dom3->find('h1[class="title"]',0)->innertext)
+                    //     {
+                    //         echo $title = $dom3->find('h1[class="title"]',0)->innertext;
+                    //         echo '<br>';
+                    //     }
+                    //     else{
+                    //         continue;
+                    //     }
 
-                        if($dom3->find('div[class="date"]',0)->innertext)
-                        {
-                            echo $date = $dom3->find('div[class="date"]',0)->innertext;
-                            echo '<br>';
-                        }
-                        else{
-                            continue;
-                        }
+                    //     if($dom3->find('div[class="date"]',0)->innertext)
+                    //     {
+                    //         echo $date = $dom3->find('div[class="date"]',0)->innertext;
+                    //         echo '<br>';
+                    //     }
+                    //     else{
+                    //         continue;
+                    //     }
 
-                        if($dom3->find('a[class="gtm_breadcrumb_subkanal"]',0)->innertext)
-                        {
-                            echo $category = $dom3->find('a[class="gtm_breadcrumb_subkanal"]',0)->innertext;
-                            echo '<br>';
-                        }
-                        else{
-                            continue;
-                        }
+                    //     if($dom3->find('a[class="gtm_breadcrumb_subkanal"]',0)->innertext)
+                    //     {
+                    //         echo $category = $dom3->find('a[class="gtm_breadcrumb_subkanal"]',0)->innertext;
+                    //         echo '<br>';
+                    //     }
+                    //     else{
+                    //         continue;
+                    //     }
 
-                        if (!empty($search->plaintext)) {
+                    //     if (!empty($search->plaintext)) {
 
-                            // $realTitle = $dom2->find('h1',2)->innertext;
-                            // echo $realTitle;
+                    //         // $realTitle = $dom2->find('h1',2)->innertext;
+                    //         // echo $realTitle;
                 
-                            // if (strpos($search->href, "cnnindonesia.com/tag/") !== false or strpos($search->href, "google.com") !== false) {
-                            //     continue;
-                            // } else {
-                            //     $cnnLink = substr($search->href, 7);
-                            //     // echo $cnnLink . "<br>";
-                            //     // $html = file_get_html($cnnLink);
-                            //     $html = setCURL($cnnLink);
-                            //     $news = new simple_html_dom();
-                            //     $news->load($html);
-                            //     $cnnArticle = $news->find("a", 0)->href;
+                    //         // if (strpos($search->href, "cnnindonesia.com/tag/") !== false or strpos($search->href, "google.com") !== false) {
+                    //         //     continue;
+                    //         // } else {
+                    //         //     $cnnLink = substr($search->href, 7);
+                    //         //     // echo $cnnLink . "<br>";
+                    //         //     // $html = file_get_html($cnnLink);
+                    //         //     $html = setCURL($cnnLink);
+                    //         //     $news = new simple_html_dom();
+                    //         //     $news->load($html);
+                    //         //     $cnnArticle = $news->find("a", 0)->href;
                 
-                            //     // $html2 = file_get_html($cnnArticle);
-                            //     $html2 = setCURL($cnnArticle);
-                            //     $new = new simple_html_dom();
-                            //     $new->load($html2);
+                    //         //     // $html2 = file_get_html($cnnArticle);
+                    //         //     $html2 = setCURL($cnnArticle);
+                    //         //     $new = new simple_html_dom();
+                    //         //     $new->load($html2);
                 
-                            //     $cnnTitle = $new->find("h1[class='title']", 0)->innertext;
-                            //     echo $cnnTitle . "<br>";
+                    //         //     $cnnTitle = $new->find("h1[class='title']", 0)->innertext;
+                    //         //     echo $cnnTitle . "<br>";
                 
-                            // if($news->find('h1[class="title"]',0)->innertext)
-                            // {
-                            // 	$title = $news->find('h1[class="title"]',0)->innertext;
-                            //     echo $title . "<br>";
-                            // }
-                            // else{
-                            // 	continue;
-                            // }
+                    //         // if($news->find('h1[class="title"]',0)->innertext)
+                    //         // {
+                    //         // 	$title = $news->find('h1[class="title"]',0)->innertext;
+                    //         //     echo $title . "<br>";
+                    //         // }
+                    //         // else{
+                    //         // 	continue;
+                    //         // }
                 
-                            // echo $news . "<br>";
-                            //}
-                        }
-                    }
+                    //         // echo $news . "<br>";
+                    //         //}
+                    //     }
+                    // }
                 }
 
-                echo "</tbody>";
+                echo "</tbody></table>";
                 ?>
-            </table>
         </section>
     </div>
 </body>

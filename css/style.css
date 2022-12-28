@@ -78,3 +78,31 @@ nav a.active {
     height: 36px;
     color: white;
 }
+
+#result {
+    min-width: 937px;
+    margin: 48px 24px;
+    text-align: center;
+}
+
+#result table {
+    margin: 0 auto;
+    display: inline-block;
+    text-align: left;
+}
+
+#result td, th {
+    padding: 8px;
+}
+
+#result th {
+    background-color: #cf4520;
+    padding-top: 12px;
+    padding-bottom: 12px;
+    color: white;
+    text-align: center !important;
+}
+
+#result tr:hover {
+    background-color: #fae6e0;
+}

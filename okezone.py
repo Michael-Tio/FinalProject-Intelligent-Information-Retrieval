@@ -14,10 +14,10 @@ news = driver.find_elements(By.CLASS_NAME, 'listnews')
 newsList = []
 
 for new in news:
-    ozTitle = new.find_element(By.XPATH, './/div[@class="explan"]/div[@class="title"]/a')
-    ozDate = new.find_element(By.CLASS_NAME, 'tgl')
-    ozCategory = new.find_element(By.CLASS_NAME, 'kanal')
-    if (ozTitle.text != '' or ozDate.text != '' or ozCategory.text != ''):
-        newsList.append([ozTitle.text, ozDate.text, ozCategory.text])
+    ozTitle = new.find_element(By.XPATH, './/div[@class="explan"]/div[@class="title"]/a').text
+    ozDate = new.find_element(By.CLASS_NAME, 'tgl').text
+    ozCategory = new.find_element(By.CLASS_NAME, 'kanal').text
+    if (ozTitle != '' or ozDate != '' or ozCategory != ''):
+        newsList.append([ozTitle, ozDate, ozCategory])
 
 print(json.dumps(newsList))

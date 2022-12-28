@@ -20,7 +20,6 @@ news = driver.find_elements(By.TAG_NAME, 'article')
 newsList = []
 i = 0
 
-
 for new in news:
     cnnTitle = new.find_element(By.CLASS_NAME, 'title')
     cnnDate = new.find_element(By.XPATH, '//*[@class="date"]')
@@ -36,13 +35,15 @@ for new in news:
             'newsCategory' : cnnCategory.text
         }
         newsList.append(crawled)
-    i += 1
-    time.sleep(8)
+    # i += 1
+    # # time.sleep(8)
+    # cnnLink = new.find_element(By.TAG_NAME, 'a').get_attribute('href')
+    # newsList.append(cnnLink)
 
 # print(json.dumps(newsList))
 
-print("here")
-print("")
+# print("here")
+# print("")
 
 df = pd.DataFrame(newsList)
 print(df)
