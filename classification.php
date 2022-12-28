@@ -19,29 +19,29 @@
         </div>
     </header>
     <nav class="navbar">
-        <a class="nav-item" href="home.php">Home</a>
-        <a class="nav-item" href="crawling.php">Crawling</a>
-        <a class="nav-item" href="">Classification</a>
+        <a class="nav-item" href="index.php">Home</a>
+        <a class="nav-item" href="crawl.php">Crawling</a>
+        <a class="nav-item" href="#">Classification</a>
         <a class="nav-item" href="evaluation.php">Evaluation</a>
     </nav>
     <section>
         <form action="" method="get">
-            <h2>News Classification using the Euclidean or Cosine Method</h2><br>
+            <h2>News Classification using the KNN</h2><br>
             <div class="search">
                 <span>Keyword:</span>
                 <div class="search-item">
                     <div class="search-textbox">
                         <i class="fa-solid fa-magnifying-glass"></i>
-                        <input type="search" name="search" class="search-text" placeholder="Search" required>
+                        <input type="keyword" name="keyword" class="search-text" placeholder="Search" required>
                     </div>
                 </div>
-                <input type="submit" name="submit" class="search-submit" value="Enter">
+                <input type="submit" name="crawl" class="search-submit" value="Enter">
             </div>
             <br>
-            <div class="radiobuttons">
-                <input type="radio" name="method" id="euclidean" value="Euclidean" checked required><label
-                    for="euclidean">Euclidean</label>
-                <input type="radio" name="method" id="cosine" value="Cosine"><label for="cosine">Cosine</label>
+            <div>
+                <input type="radio" name="news_portal" id="okezone" value="okezone" checked required><label
+                    for="okezone">Okezone</label>
+                <input type="radio" name="news_portal" id="cnn" value="cnn"><label for="cnn">CNN</label>
             </div>
         </form>
     </section>
@@ -51,61 +51,107 @@
                 <tr>
                     <td>Title</td>
                     <td>Date</td>
-                    <td>Category</td>
+                    <td>Original Category</td>
+                    <td>System Classification</td>
                 </tr>
             </thead>
             <tbody>
                 <?php
-                    require_once __DIR__ . '/vendor/autoload.php';
-                    include_once('simple_html_dom.php');
+                require_once __DIR__ . '/vendor/autoload.php';
+                include_once('simple_html_dom.php');
 
-                    if (isset($_POST['crawl']) && isset($_POST['news_portal'])) {
-                        $stemmerFactory = new \Sastrawi\Stemmer\StemmerFactory();
-                        $stemmer = $stemmerFactory->createStemmer();
-                        $stopwordFactory = new \Sastrawi\StopWordRemover\StopWordRemoverFactory();
-                        $stopword = $stopwordFactory->createStopWordRemover();
-                        $con = mysqli_connect("localhost" ,"root" ,"","berita");
-                        $sql_select = "SELECT * FROM `training`";
-                        $result = mysqli_query($con, $sql_select);
+                use Phpml\FeatureExtraction\TokenCountVectorizer;
+                use Phpml\Tokenization\WhitespaceTokenizer;
+                use Phpml\FeatureExtraction\TfIdfTransformer;
+                use Phpml\Classification\KNearestNeighbors;
 
-                        if ($_POST['news_portal'] == 'okezone') {
-                            
-                            $key = str_replace(" ", "%20", $_POST["keyword"]);
-                            $html = file_get_html("https://search.okezone.com/search?q=" . $key);
-                            echo $html;
+                $data_train = array();
+                $sample_data = array();
+                $category = array();
+                $command = "";
 
-                            foreach ($html->find('div[class="listnews"]') as $berita) {
-                                // $cnnTitle = $berita->find('h2[class="title"]', 0)->plaintext;
-                                $cnnDate = $berita->find('div[class="tgl"]');
-                                $cnnCategory = $berita->find('div[class="kanal"]')->plaintext;
+                if (isset($_GET['crawl']) && isset($_GET['news_portal'])) {
+                    $stemmerFactory = new \Sastrawi\Stemmer\StemmerFactory();
+                    $stemmer = $stemmerFactory->createStemmer();
+                    $stopwordFactory = new \Sastrawi\StopWordRemover\StopWordRemoverFactory();
+                    $stopword = $stopwordFactory->createStopWordRemover();
 
-                                echo "<tr>";
-                                // echo "<td>$cnnTitle</td>";
-                                echo "<td>$cnnDate</td>";
-                                echo "<td>$cnnCategory</td>";
-                                echo "<tr>";
-                            }
-                        } else {
-                            $key = str_replace(" ", "+", $_POST['keyword']);
-                            $html = file_get_html("https://www.cnnindonesia.com/search/?query=" . $key);
+                    //Crawls News Data
+                    $stemNews = $stemmer->stem($_GET['keyword']);
+                    $stopNews = $stopword->remove($stemNews);
 
-                            foreach ($html->find('article') as $berita) {
-                                $cnnTitle = $berita->find('h2[class="title"]', 0)->plaintext;
-                                // $cnnDate = $berita->find('span[class="box_text"]', 0)->find('span[class="date"]', 0)->innertext;
-                                $cnnCategory = $html->find('span[class="kanal"]', 0);
+                    if ($_GET['news_portal'] == 'okezone') {
+                        $key = str_replace(" ", "%20", $_GET["keyword"]);
+                        $command = "python okezone.py " . $key;
 
-                                echo "<tr>";
-                                echo "<td>$cnnTitle</td>";
-                                // echo "<td>$cnnDate</td>";
-                                echo "<td>$cnnCategory</td>";
-                                echo "<tr>";
+                        //Retrieve Training Data from Database
+                        $con = mysqli_connect("localhost", "root", "", "berita");
+                        $res = $con->query("SELECT * FROM training");
+
+                        while ($row = $res->fetch_assoc()) {
+                            if($row['portal'] == "okezone"){
+                                $sample_data[] = $row['clean_title'];
+                                $category[] = $row['category'];
                             }
                         }
+                        $data_train = $sample_data;
                     } else {
-                        echo "eror";
-                    }
+                        $key = str_replace(" ", "+", $_GET['keyword']);
+                        $command = "python cnnidn.py " . $key;
 
-                    ?>
+                        //Retrieve Training Data from Database
+                        $con = mysqli_connect("localhost", "root", "", "berita");
+                        $res = $con->query("SELECT * FROM training");
+
+                        while ($row = $res->fetch_assoc()) {
+                            if($row['portal'] == "cnn"){
+                                $sample_data[] = $row['clean_title'];
+                                $category[] = $row['category'];
+                            }
+                        }
+                        $data_train = $sample_data;
+                    }
+                    $output = shell_exec($command);
+                    $result = json_decode($output, true);
+
+                    //Classification News Data
+                    foreach ((array) $result as $data) {
+                        $outputStem = $stemmer->stem($data[0]);
+                        $outputStop = $stopword->remove($outputStem);
+
+                        $sample_data[] = $outputStop;
+
+                        //Calculate Tf-Idf for The New News Data
+                        $tf = new TokenCountVectorizer(new WhitespaceTokenizer());
+                        $tf->fit($sample_data);
+                        $tf->transform($sample_data);
+
+                        $tfidf = new TfIdfTransformer($sample_data);
+                        $tfidf->transform($sample_data);
+
+                        //Delete New News Data In The Last Index of Array
+                        $new_data = $sample_data[count($sample_data) - 1];
+                        array_pop($sample_data);
+
+                        //Classfication News Category Using KNN
+                        $k = round(sqrt(count($sample_data)));
+                        $classifier = new KNearestNeighbors($k);
+                        $classifier->train($sample_data, $category);
+                        $classfication = $classifier->predict($new_data);
+
+                        // $sql = "INSERT INTO `testing`(`title`, `date`, `original_category`, `classification`) VALUES ('" . $data[0] . "','" . $data[1] . "','" . $data[2] . "','" . $classfication . "')";
+                        // mysqli_query($con, $sql);
+
+                        $sample_data = $data_train;
+
+                        echo "<tr>";
+                        echo "<td>$data[0]</td>";
+                        echo "<td>$data[1]</td>";
+                        echo "<td>$data[2]</td>";
+                        echo "<td>$classfication</td></tr>";
+                    }
+                }
+                ?>
             </tbody>
         </table>
     </section>

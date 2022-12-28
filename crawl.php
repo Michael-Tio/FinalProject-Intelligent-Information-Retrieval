@@ -14,7 +14,7 @@
         <nav>
             <a href="index.php">Home</a> |
             <a href="crawl.php" class="active">Crawling</a> |
-            <a href="">Classification</a> |
+            <a href="classification.php">Classification</a> |
             <a href="">Evaluation</a>
         </nav>
         <section id="search">
@@ -82,7 +82,7 @@
                         $outputStem = $stemmer->stem($data[0]);
                         $outputStop = $stopword->remove($outputStem);
 
-                        $sql = "INSERT INTO `training`(`title`, `clean_title`, `category`, `date`, `portal`) VALUES ('".$data[0]."','".$outputStop."','".$data[1]."','".$data[2]."','okezone')";
+                        $sql = "INSERT INTO `training`(`title`, `clean_title`, `category`, `date`, `portal`) VALUES ('".$data[0]."','".$outputStop."','".$data[2]."','".$data[1]."','okezone')";
                         mysqli_query($con,$sql);
                     }
                 
@@ -100,7 +100,7 @@
                         $outputStem = $stemmer->stem($data[0]);
                         $outputStop = $stopword->remove($outputStem);
                         
-                        $sql = "INSERT INTO `training`(`title`, `clean_title`, `category`, `date`, `portal`) VALUES ('".$data[0]."','".$outputStop."','".$data[1]."','".$data[2]."','cnn')";
+                        $sql = "INSERT INTO `training`(`title`, `clean_title`, `category`, `date`, `portal`) VALUES ('".$data[0]."','".$outputStop."','".$data[2]."','".$data[1]."','cnn')";
                         mysqli_query($con,$sql);
                     }
                 
