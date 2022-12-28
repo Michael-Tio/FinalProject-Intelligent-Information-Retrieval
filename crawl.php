@@ -35,6 +35,9 @@
                 <?php
                 require_once __DIR__ . '/vendor/autoload.php';
                 include_once('simple_html_dom.php');
+                $con = mysqli_connect("localhost" ,"root" ,"","berita");
+                $sql = "";
+
 
                 function setCURL($url)
                 {
@@ -75,6 +78,12 @@
                         echo "<td>$data[1]</td>";
                         echo "<td>$data[2]</td>";
                         echo "<tr>";
+
+                        $outputStem = $stemmer->stem($data[0]);
+                        $outputStop = $stopword->remove($outputStem);
+
+                        $sql = "INSERT INTO `training`(`title`, `clean_title`, `category`, `date`, `portal`) VALUES ('".$data[0]."','".$outputStop."','".$data[1]."','".$data[2]."','okezone')";
+                        mysqli_query($con,$sql);
                     }
                 
                     // CRAWL CNN
@@ -87,7 +96,12 @@
                         echo "<td>$data[0]</td>";
                         echo "<td>$data[1]</td>";
                         echo "<td>$data[2]</td>";
-                        echo "<tr>";
+
+                        $outputStem = $stemmer->stem($data[0]);
+                        $outputStop = $stopword->remove($outputStem);
+                        
+                        $sql = "INSERT INTO `training`(`title`, `clean_title`, `category`, `date`, `portal`) VALUES ('".$data[0]."','".$outputStop."','".$data[1]."','".$data[2]."','cnn')";
+                        mysqli_query($con,$sql);
                     }
                 
                     // CURL
@@ -209,6 +223,7 @@
                 }
 
                 echo "</tbody></table>";
+                mysqli_close($con);
                 ?>
         </section>
     </div>

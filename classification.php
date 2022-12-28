@@ -64,8 +64,12 @@
                         $stemmer = $stemmerFactory->createStemmer();
                         $stopwordFactory = new \Sastrawi\StopWordRemover\StopWordRemoverFactory();
                         $stopword = $stopwordFactory->createStopWordRemover();
+                        $con = mysqli_connect("localhost" ,"root" ,"","berita");
+                        $sql_select = "SELECT * FROM `training`";
+                        $result = mysqli_query($con, $sql_select);
 
                         if ($_POST['news_portal'] == 'okezone') {
+                            
                             $key = str_replace(" ", "%20", $_POST["keyword"]);
                             $html = file_get_html("https://search.okezone.com/search?q=" . $key);
                             echo $html;
