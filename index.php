@@ -1,4 +1,3 @@
-<?php require 'CosineSimilarity.php'?>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -27,7 +26,7 @@
                 <form action="" method="post">
                     Keyword :
                     <i class="material-icons">search</i>
-                    <input type="text" placeholder="Search">
+                    <input type="text" placeholder="Search" name="keyword">
                     <input type="submit" name="search" value="Find">
                     <br><br>
                     <div style="margin-right: 450px;">
@@ -39,9 +38,11 @@
                 </form>
             </div>
         </section>
-        <section>
+        <section id="result">
             <?php
-                require_once __DIR__ . '/vendor/autoload.php ';
+                require_once __DIR__ . '/vendor/autoload.php';
+                require 'CosineSimilarity.php';
+
                 use Phpml\FeatureExtraction\TokenCountVectorizer;
                 use Phpml\Tokenization\WhitespaceTokenizer;
                 use Phpml\FeatureExtraction\TfIdfTransformer;
@@ -57,64 +58,46 @@
                     $i=1;
                     $sample_data = array();
                     $judul = array();
-                    $con = mysqli_connect("localhost" ,"root" ,"","news");
-                    $sql_select = "SELECT title,clean_data FROM contents";
+                    $con = mysqli_connect("localhost" ,"root" ,"","berita");
+                    $sql_select = "SELECT * FROM training";
                     $result = mysqli_query($con,$sql_select);
 
                     $sql = "";
 
                     if (mysqli_num_rows($result)>0) {
-                    $outputStem = $stemmer->stem($_POST["keyword"]);
-                    $outputStop = $stopword->remove($outputStem);
-                    $sample_data[0] = $outputStop;
+                        $outputStem = $stemmer->stem($_POST["keyword"]);
+                        $outputStop = $stopword->remove($outputStem);
+                        $sample_data[0] = $outputStop;
 
-                    while($row = mysqli_fetch_assoc($result)) {
-                        $sample_data[$i] = $row["clean_data"];
-                        $judul[$i] = $row["title"];
-                        $i++;
-                    }
-
-                    $tf =new TokenCountVectorizer(new WhitespaceTokenizer());
-                    $tf->fit($sample_data);
-                    $tf->transform($sample_data);
-
-                    $tfidf = new TfIdfTransformer($sample_data);
-                    $tfidf->transform($sample_data);
-                    }
-
-                    //lom test work ato nggk
-                    $euclidean = new Euclidean();
-                    if($_POST['similarity'] == "euclidean"){
-                        //Euclidean
-                        for($i=1;$i<count($sample_data);$i++) {
-                            $hasil = 0.0;
-                            $hasil = $euclidean -> distance($sample_data[$i], $sample_data[0]);
-                            $sql = 'UPDATE contents SET similarity = "'. round($hasil,2). '" WHERE title = "'. $judul[$i].'"';
-                        }
-                    }else if($_POST['similarity'] == "cosine"){
-                        //cosine
-                        for($i=1;$i<count($sample_data);$i++) {
-                            $hasil = 0.0;
-                            $hasil = CosineSimilarity::calc($sample_data[$i], $sample_data[0]);
-                            $sql = 'UPDATE contents SET similarity = "'. round($hasil,2). '" WHERE title = "'. $judul[$i].'"';
+                        while($row = mysqli_fetch_assoc($result)) {
+                            $sample_data[$i] = $row["clean_title"];
+                            $judul[$i] = $row["title"];
+                            $i++;
                         }
 
+                        $tf = new TokenCountVectorizer(new WhitespaceTokenizer());
+                        $tf->fit($sample_data);
+                        $tf->transform($sample_data);
+
+                        $tfidf = new TfIdfTransformer($sample_data);
+                        $tfidf->transform($sample_data);
                     }
+
 
                     echo "<table border='1'>";
                     echo "<th align='center'>News Title</th>";
-                    echo "<th align='center'>News Link</th>";
-                    echo "<th align='center'>Similarity Score</th>c/tr>";
+                    echo "<th align='center'>Similarity Score</th></tr>";
 
-                    $sql_select = "SELECT title,link,similarity FROM contents ORDER BY similarity asc";
-                    $result = mysqli_query($con, $sql_select);
-
-                    if(mysqli_num_rows($result) >0) {
-                        while($row = mysqli_fetch_assoc($result)){
-                            echo "<tr><td>".$row["title"]."</td>";
-                            echo "<td>" .$row["link"]. "</td>";
-                            echo "<td>" .$row["similarity"]."</td></tr>";
+                    $euclidean = new Euclidean();
+                    for($i=1;$i<count($sample_data);$i++) {
+                        $hasil = 0.0;
+                        if($_POST['similarity'] == "euclidean"){
+                            $hasil = $euclidean -> distance($sample_data[$i], $sample_data[0]);
+                        }else if($_POST['similarity'] == "cosine"){
+                            $hasil = CosineSimilarity::calc($sample_data[$i], $sample_data[0]);
                         }
+                        echo "<tr><td>".$judul[$i]."</td>";
+                        echo "<td>" .round($hasil,3)."</td></tr>";
                     }
 
                     echo "</table>";
