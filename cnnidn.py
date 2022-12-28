@@ -11,7 +11,7 @@ from selenium.webdriver.support import expected_conditions as EC
 
 keyCNN = sys.argv[1]
 
-path = 'C:/Users/ASUS/Downloads/INSTALLER/chromedriver'
+path = 'C:/Users/62821/Chromedriver/chromedriver'
 options = webdriver.ChromeOptions()
 options.add_experimental_option('excludeSwitches', ['enable-logging'])
 driver = webdriver.Chrome(executable_path = path, options = options, service = Service(ChromeDriverManager().install()))
@@ -24,15 +24,18 @@ newsList = []
 
 for new in news:
     cnnLink = new.find_element(By.TAG_NAME, 'a').get_attribute('href')
-
-    if '.com/tag/' in cnnLink:
-        continue
-    else:
-        driver2.get(cnnLink)
-        cnnTitle = driver2.find_element(By.CSS_SELECTOR, 'h1.title').text
-        cnnDate = driver2.find_element(By.CSS_SELECTOR, 'div.date').text
-        cnnCategory = driver2.find_element(By.CSS_SELECTOR, 'a.gtm_breadcrumb_kanal').text
-        if (cnnTitle != '' or cnnDate != '' or cnnCategory != ''):
-            newsList.append([cnnTitle, cnnDate, cnnCategory])
+    if 'www.cnnindonesia.com/' in cnnLink:
+        if '.com/tag/' in cnnLink:
+            continue
+        else:
+            driver2.get(cnnLink)
+            cnnTitle = driver2.find_element(By.XPATH, '//h1[@class="title"]').text
+            cnnDate = driver2.find_element(By.XPATH, '//*[@class="date"]').text
+            cnnCategory = driver2.find_element(By.XPATH, '//a[@class="gtm_breadcrumb_kanal"]').text
+            if (cnnTitle != '' or cnnDate != '' or cnnCategory != ''):
+                newsList.append([cnnTitle, cnnDate, cnnCategory])
+            # print(cnnTitle)
+            # print(cnnDate)
+            # print(cnnCategory)
 
 print(json.dumps(newsList))
