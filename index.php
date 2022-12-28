@@ -1,3 +1,5 @@
+<?php require 'CosineSimilarity.php'?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -26,10 +28,13 @@
                     Keyword :
                     <i class="material-icons">search</i>
                     <input type="text" placeholder="Search">
-                    <input type="submit" value="Find">
-                    <div>
-                        <input type="radio" name="similarity" value="euclidean" checked>Euclidean
-                        <input type="radio" name="similarity" value="cosine">Cosine
+                    <input type="submit" name="search" value="Find">
+                    <br><br>
+                    <div style="margin-right: 450px;">
+                        <input type="radio" name="similarity"  
+                        value="euclidean" required>Euclidean
+                        <input type="radio" name="similarity" 
+                        value="cosine">Cosine
                     </div>
                 </form>
             </div>
@@ -77,24 +82,22 @@
                     $tfidf->transform($sample_data);
                     }
 
-                    //Chebyshev
-                    // for($i=1;$i<count($sample_data);$i++) {
-                    // $hasil = 0.0;
-                    // for($x=0;$x<count($sample_data[$i]);$x++){
-                    //     if(abs($sample_data[0][$x] - $sample_data[$i][$x])>$hasil){
-                    //     $hasil = abs($sample_data[0][$x] -$sample_data[$i][$x]);
-                    //     }
-                    // }
-
-                    // $sql = 'UPDATE contents SET similarity = "'. round($hasil,2). '" WHERE title = "'. $judul[$i].'"';
-                    // mysqli_query($con, $sql);
-                    // }
-
+                    //lom test work ato nggk
+                    $euclidean = new Euclidean();
                     if($_POST['similarity'] == "euclidean"){
                         //Euclidean
-                        echo "test";
+                        for($i=1;$i<count($sample_data);$i++) {
+                            $hasil = 0.0;
+                            $hasil = $euclidean -> distance($sample_data[$i], $sample_data[0]);
+                            $sql = 'UPDATE contents SET similarity = "'. round($hasil,2). '" WHERE title = "'. $judul[$i].'"';
+                        }
                     }else if($_POST['similarity'] == "cosine"){
                         //cosine
+                        for($i=1;$i<count($sample_data);$i++) {
+                            $hasil = 0.0;
+                            $hasil = CosineSimilarity::calc($sample_data[$i], $sample_data[0]);
+                            $sql = 'UPDATE contents SET similarity = "'. round($hasil,2). '" WHERE title = "'. $judul[$i].'"';
+                        }
 
                     }
 
