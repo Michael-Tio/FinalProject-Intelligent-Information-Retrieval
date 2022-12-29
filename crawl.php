@@ -15,7 +15,7 @@
             <a href="index.php">Home</a> |
             <a href="crawl.php" class="active">Crawling</a> |
             <a href="classification.php">Classification</a> |
-            <a href="">Evaluation</a>
+            <a href="evaluation.php">Evaluation</a>
         </nav>
         <section id="search">
             <div id="title">
@@ -82,8 +82,14 @@
                         $outputStem = $stemmer->stem($data[0]);
                         $outputStop = $stopword->remove($outputStem);
 
-                        $sql = "INSERT INTO `training`(`title`, `clean_title`, `category`, `date`, `portal`) VALUES ('".$data[0]."','".$outputStop."','".$data[2]."','".$data[1]."','okezone')";
-                        mysqli_query($con,$sql);
+                        $portal = "okezone";
+
+                        // $sql = "INSERT INTO training('title', 'clean_title', 'category', 'date', 'portal') VALUES ('".$data[0]."','".$outputStop."','".$data[2]."','".$data[1]."','okezone')";
+                        $sql = "INSERT INTO training(title, clean_title, category, date, portal) VALUES (?, ?, ?, ?, ?)";
+                        $stmt = $con->prepare($sql);
+                        $stmt->bind_param('sssss', $data[0], $outputStop, $data[2], $data[1], $portal);
+                        $stmt->execute();
+                        // mysqli_query($con,$sql);
                     }
                 
                     // CRAWL CNN
@@ -99,9 +105,16 @@
 
                         $outputStem = $stemmer->stem($data[0]);
                         $outputStop = $stopword->remove($outputStem);
+
+                        $portal = "cnn";
                         
-                        $sql = "INSERT INTO `training`(`title`, `clean_title`, `category`, `date`, `portal`) VALUES ('".$data[0]."','".$outputStop."','".$data[2]."','".$data[1]."','cnn')";
-                        mysqli_query($con,$sql);
+                        // $sql = "INSERT INTO training('title', 'clean_title', 'category', 'date', 'portal') VALUES ('".$data[0]."','".$outputStop."','".$data[2]."','".$data[1]."','cnn')";
+                        // mysqli_query($con,$sql);
+
+                        $sql = "INSERT INTO training(title, clean_title, category, date, portal) VALUES (?, ?, ?, ?, ?)";
+                        $stmt = $con->prepare($sql);
+                        $stmt->bind_param('sssss', $data[0], $outputStop, $data[2], $data[1], $portal);
+                        $stmt->execute();
                     }
                 
                     // CURL
