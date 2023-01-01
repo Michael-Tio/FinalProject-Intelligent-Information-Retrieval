@@ -142,6 +142,7 @@
                         echo "<td>$data[2]</td>";
                         echo "<td>$classfication</td></tr>";
                     }
+                    echo "</tbody></table>";
                 }
                 ?>
             </tbody>

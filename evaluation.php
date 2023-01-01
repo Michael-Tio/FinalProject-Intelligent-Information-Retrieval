@@ -76,7 +76,7 @@
 
             $correctAccuracy = round(($correctCount / $totalData) * 100, 2);
             $wrongAccuracy = round(($wrongCount / $totalData) * 100, 2);
-            echo "</tbody>";
+            echo "</tbody></table>";
             ?>
 
             <script type="text/javascript">
@@ -99,7 +99,10 @@
                 }
             </script>
 
-            <div id="piechart" style="width: 400px; height: 250px; margin: auto; "></div>
+            <div id="title">
+                <h2>Accuracy</h2>
+            </div>
+            <div id="piechart" style="width: 800px; height: 300px; margin: auto; "></div>
         </section>
     </div>
 </body>
