@@ -28,8 +28,8 @@
                     <i class="material-icons">search</i>
                     <input type="text" placeholder="Search" name="keyword">
                     <input type="submit" name="search" value="Find">
-                    <br><br>
-                    <div style="margin-right: 450px;">
+                    <br>
+                    <div>
                         <input type="radio" name="similarity"  
                         value="euclidean" required>Euclidean
                         <input type="radio" name="similarity" 
@@ -55,7 +55,7 @@
                     $stopwordFactory =new \Sastrawi\StopWordRemover\StopWordRemoverFactory();
                     $stopword = $stopwordFactory->createStopWordRemover();
 
-                    $i=1;
+                    $i=0;
                     $sample_data = array();
                     $judul = array();
                     $con = mysqli_connect("localhost" ,"root" ,"","berita");
@@ -65,15 +65,15 @@
                     $sql = "";
 
                     if (mysqli_num_rows($result)>0) {
-                        $outputStem = $stemmer->stem($_POST["keyword"]);
-                        $outputStop = $stopword->remove($outputStem);
-                        $sample_data[0] = $outputStop;
-
                         while($row = mysqli_fetch_assoc($result)) {
                             $sample_data[$i] = $row["clean_title"];
                             $judul[$i] = $row["title"];
                             $i++;
                         }
+
+                        $outputStem = $stemmer->stem($_POST["keyword"]);
+                        $outputStop = $stopword->remove($outputStem);
+                        $sample_data[] = $outputStop;
 
                         $tf = new TokenCountVectorizer(new WhitespaceTokenizer());
                         $tf->fit($sample_data);
@@ -87,18 +87,49 @@
                     echo "<table border='1'>";
                     echo "<th align='center'>News Title</th>";
                     echo "<th align='center'>Similarity Score</th></tr>";
-
+                    
                     $euclidean = new Euclidean();
-                    for($i=1;$i<count($sample_data);$i++) {
-                        $hasil = 0.0;
-                        if($_POST['similarity'] == "euclidean"){
-                            $hasil = $euclidean -> distance($sample_data[$i], $sample_data[0]);
-                        }else if($_POST['similarity'] == "cosine"){
-                            $hasil = CosineSimilarity::calc($sample_data[$i], $sample_data[0]);
+                    $jum = count($sample_data);
+                    if($_POST['similarity'] == "euclidean"){
+                        for($i=0;$i<$jum-1;$i++) {
+                            $hasil = 0.0;
+                            $hasil = $euclidean -> distance($sample_data[$i], $sample_data[$jum-1]);
+                            echo "<tr><td>".$judul[$i]."</td>";
+                            echo "<td>" .round($hasil,3)."</td></tr>";
                         }
-                        echo "<tr><td>".$judul[$i]."</td>";
-                        echo "<td>" .round($hasil,3)."</td></tr>";
+                    }else if($_POST['similarity'] == "cosine"){
+                        for($i=0; $i<$jum-1; $i++){
+                            $numerator = 0.0;
+                            $denom_wkq = 0.0;
+                            $denom_wkj = 0.0;
+                            $denumerator = 0.0;
+                            for($x=0; $x<count($sample_data[$i]); $x++){
+                                $numerator += $sample_data[$jum-1][$x] * $sample_data[$i][$x];
+                                $denom_wkq += pow($sample_data[$jum-1][$x], 2);
+                                $denom_wkj += pow($sample_data[$i][$x], 2);
+                            }
+                            $denumerator = sqrt($denom_wkq*$denom_wkj);
+                            if($denumerator != 0)
+                            {
+                                $result = $numerator / $denumerator;
+                            }
+                            else{
+                                $result = 0;
+                            }
+                            echo "<tr><td>".$judul[$i]."</td>";
+                            echo "<td>" .round($result,3)."</td></tr>";
+                        }
                     }
+                    // for($i=0;$i<count($sample_data)-1;$i++) {
+                    //     $hasil = 0.0;
+                    //     if($_POST['similarity'] == "euclidean"){
+                    //         $hasil = $euclidean -> distance($sample_data[$i], $sample_data[0]);
+                    //     }else if($_POST['similarity'] == "cosine"){
+                    //         $hasil = CosineSimilarity::calc($sample_data[$i], $sample_data[0]);
+                    //     }
+                    //     echo "<tr><td>".$judul[$i]."</td>";
+                    //     echo "<td>" .round($hasil,3)."</td></tr>";
+                    // }
 
                     echo "</table>";
                     mysqli_close($con);
