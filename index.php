@@ -59,6 +59,8 @@
                 $sql_select = "SELECT * FROM training";
                 $result = mysqli_query($con, $sql_select);
 
+                $similarityArr = array();
+
                 $sql = "";
 
                 if (mysqli_num_rows($result) > 0) {
@@ -87,13 +89,11 @@
                 $jum = count($sample_data);
                 $hasil = 0.0;
                 if ($_POST['similarity'] == "euclidean") {
-                    $similarityArr = array();
                     for ($i = 0; $i < $jum - 1; $i++) {
                         $hasil = $euclidean->distance($sample_data[$i], $sample_data[$jum - 1]);
                         array_push($similarityArr, round($hasil, 3));
                     }
                 } else if ($_POST['similarity'] == "cosine") {
-                    $similarityArr = array();
                     for ($i = 0; $i < $jum - 1; $i++) {
                         $numerator = 0.0;
                         $denom_wkq = 0.0;
@@ -119,7 +119,6 @@
                     echo "<tr><td>" . $judul[$i] . "</td>";
                     echo "<td>" . $similarityArr[$i] . "</td></tr>";
                 }
-                echo count($similarityArr);
                 // for($i=0;$i<count($sample_data)-1;$i++) {
                 //     $hasil = 0.0;
                 //     if($_POST['similarity'] == "euclidean"){
