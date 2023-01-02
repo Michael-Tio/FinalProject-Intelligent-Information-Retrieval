@@ -92,12 +92,6 @@
                         $hasil = $euclidean->distance($sample_data[$i], $sample_data[$jum - 1]);
                         array_push($similarityArr, round($hasil, 3));
                     }
-                    array_multisort($similarityArr, SORT_DESC, SORT_NUMERIC, $judul);
-
-                    for ($i = 0; $i < $jum - 1; $i++) {
-                        echo "<tr><td>" . $judul[$i] . "</td>";
-                        echo "<td>" . $similarityArr[$i] . "</td></tr>";
-                    }
                 } else if ($_POST['similarity'] == "cosine") {
                     $similarityArr = array();
                     for ($i = 0; $i < $jum - 1; $i++) {
@@ -118,13 +112,14 @@
                         }
                         array_push($similarityArr, round($hasil, 3));
                     }
-                    array_multisort($similarityArr, SORT_DESC, SORT_NUMERIC, $judul);
-
-                    for ($i = 0; $i < $jum - 1; $i++) {
-                        echo "<tr><td>" . $judul[$i] . "</td>";
-                        echo "<td>" . $similarityArr[$i] . "</td></tr>";
-                    }
                 }
+                array_multisort($similarityArr, SORT_DESC, SORT_NUMERIC, $judul);
+
+                for ($i = 0; $i < $jum - 1; $i++) {
+                    echo "<tr><td>" . $judul[$i] . "</td>";
+                    echo "<td>" . $similarityArr[$i] . "</td></tr>";
+                }
+                echo count($similarityArr);
                 // for($i=0;$i<count($sample_data)-1;$i++) {
                 //     $hasil = 0.0;
                 //     if($_POST['similarity'] == "euclidean"){
