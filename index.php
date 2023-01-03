@@ -22,15 +22,19 @@
                 <h1>Welcome to Berita Lambe Turah</h1>
             </div>
             <div id="input">
-                <form action="" method="post">
+                <form action="" method="get">
                     Keyword :
                     <i class="material-icons">search</i>
-                    <input type="text" placeholder="Search" name="keyword" value="<?= (isset($_POST['keyword'])) ? $_POST['keyword'] : '' ?>" required>
+                    <input type="text" placeholder="Search" name="keyword" value="<?= (isset($_GET['keyword'])) ? $_GET['keyword'] : '' ?>" required>
                     <input type="submit" name="search" value="Find">
                     <br>
                     <div>
-                        <input type="radio" name="similarity" value="euclidean" checked required><label for="euclidean">Euclidean</label>
-                        <input type="radio" name="similarity" value="cosine"><label for="cosine">Cosine</label>
+                        <input type="radio" name="similarity" value="euclidean" 
+                        <?php if (isset($_GET['similarity']) && $_GET['similarity']=="euclidean") echo "checked";?>
+                         required><label for="euclidean">Euclidean</label>
+                        <input type="radio" name="similarity" value="cosine"
+                        <?php if (isset($_GET['similarity']) && $_GET['similarity']=="cosine") echo "checked";?>
+                        ><label for="cosine">Cosine</label>
                     </div>
                 </form>
             </div>
@@ -45,7 +49,7 @@
             use Phpml\FeatureExtraction\TfIdfTransformer;
             use Phpml\Math\Distance\Euclidean;
 
-            if (isset($_POST["search"])) {
+            if (isset($_GET["search"])) {
                 $stemmerFactory = new \Sastrawi\Stemmer\StemmerFactory();
                 $stemmer = $stemmerFactory->createStemmer();
 
@@ -69,7 +73,7 @@
                         $judul[$i] = $row["title"];
                         $i++;
                     }
-                    $outputStem = $stemmer->stem($_POST["keyword"]);
+                    $outputStem = $stemmer->stem($_GET["keyword"]);
                     $outputStop = $stopword->remove($outputStem);
                     $sample_data[] = $outputStop;
                 }
@@ -81,19 +85,18 @@
                 $tfidf = new TfIdfTransformer($sample_data);
                 $tfidf->transform($sample_data);
 
-                echo "<table><thead>";
-                echo "<tr><th>News Title</th><th>Similarity Score</th></tr>";
-                echo "</thead><tbody>";
-
                 $euclidean = new Euclidean();
                 $jum = count($sample_data);
                 $hasil = 0.0;
-                if ($_POST['similarity'] == "euclidean") {
+
+                if ($_GET['similarity'] == "euclidean") {
                     for ($i = 0; $i < $jum - 1; $i++) {
                         $hasil = $euclidean->distance($sample_data[$i], $sample_data[$jum - 1]);
                         array_push($similarityArr, round($hasil, 3));
                     }
-                } else if ($_POST['similarity'] == "cosine") {
+                    array_multisort($similarityArr, SORT_ASC, SORT_NUMERIC, $judul);
+
+                } else if ($_GET['similarity'] == "cosine") {
                     for ($i = 0; $i < $jum - 1; $i++) {
                         $numerator = 0.0;
                         $denom_wkq = 0.0;
@@ -112,8 +115,64 @@
                         }
                         array_push($similarityArr, round($hasil, 3));
                     }
+                    array_multisort($similarityArr, SORT_DESC, SORT_NUMERIC, $judul);
                 }
-                array_multisort($similarityArr, SORT_DESC, SORT_NUMERIC, $judul);
+
+                
+                $topJuduls = array_slice($judul,0,3);
+                $topJudul_clean = array();
+                foreach($topJuduls as $topJudul){
+                    $topJudulStem = $stemmer->stem($topJudul);
+                    $topJudulStop = $stopword->remove($topJudulStem);
+                    $topJudul_clean[] = $topJudulStop;
+                }
+
+                $topJudul_clean[] = $outputStop;
+
+                $tf = new TokenCountVectorizer(new WhitespaceTokenizer());
+                $tf->fit($topJudul_clean);
+                $tf->transform($topJudul_clean);
+                $vocabulary = $tf->getVocabulary();
+
+                $tfidf = new TfIdfTransformer($topJudul_clean);
+                $tfidf->transform($topJudul_clean);
+
+                $i=1;
+                $relatedWord = "";
+                echo "<b>TF-IDF</b><br><br>" ;
+                echo "<table border='1'>";
+                echo "<tr><th align='center'></th>";
+                foreach($vocabulary as $term) echo "<th align='center'>".$term."</th>" ;
+                echo "</tr>";
+                foreach($topJudul_clean as $isi){
+                if($i==count($topJudul_clean)) echo "<tr><td>Q</td>" ;
+                else echo "<tr><td>D".$i."</td>" ;
+
+                foreach($isi as $item) {
+                    echo "<td>".round($item,1)."</td>";
+                }
+                echo "</tr>" ;
+                $i++;
+                }
+                echo "</table><br><br>" ;
+
+                echo "<b>Related Keyword</b>";
+                echo "<br>";
+                for ($i=0; $i < count($topJudul_clean) - 1 ; $i++) { 
+                    for ($j=0; $j < count($topJudul_clean[$i])- 1 ; $j++) { 
+                        if ($topJudul_clean[$i][$j] < 0.4 && $topJudul_clean[$i][$j] > 0 ){
+                            $relatedWord .= $vocabulary[$j] . " ";
+                        }
+                   }
+                    echo $relatedWord;
+                    echo "<br>";
+                    $relatedWord = "";
+                }
+
+                echo "<br>";
+                echo "<table><thead>";
+                echo "<tr><th>News Title</th><th>Similarity Score</th></tr>";
+                echo "</thead><tbody>";
 
                 for ($i = 0; $i < $jum - 1; $i++) {
                     echo "<tr><td>" . $judul[$i] . "</td>";
@@ -121,9 +180,9 @@
                 }
                 // for($i=0;$i<count($sample_data)-1;$i++) {
                 //     $hasil = 0.0;
-                //     if($_POST['similarity'] == "euclidean"){
+                //     if($_GET['similarity'] == "euclidean"){
                 //         $hasil = $euclidean -> distance($sample_data[$i], $sample_data[0]);
-                //     }else if($_POST['similarity'] == "cosine"){
+                //     }else if($_GET['similarity'] == "cosine"){
                 //         $hasil = CosineSimilarity::calc($sample_data[$i], $sample_data[0]);
                 //     }
                 //     echo "<tr><td>".$judul[$i]."</td>";
