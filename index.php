@@ -118,16 +118,16 @@
                     array_multisort($similarityArr, SORT_DESC, SORT_NUMERIC, $judul);
                 }
 
-                
-                $topJuduls = array_slice($judul,0,3);
+                //Query Expansion
+                $topJuduls = array_slice($judul,0,3);//Ambil 3 berita teratas
                 $topJudul_clean = array();
-                foreach($topJuduls as $topJudul){
+                foreach($topJuduls as $topJudul){//stem&stopword berita teratas
                     $topJudulStem = $stemmer->stem($topJudul);
                     $topJudulStop = $stopword->remove($topJudulStem);
                     $topJudul_clean[] = $topJudulStop;
                 }
 
-                $topJudul_clean[] = $outputStop;
+                $topJudul_clean[] = $outputStop;//memasukan clean search keyword kedalam berita
 
                 $tf = new TokenCountVectorizer(new WhitespaceTokenizer());
                 $tf->fit($topJudul_clean);
@@ -137,8 +137,8 @@
                 $tfidf = new TfIdfTransformer($topJudul_clean);
                 $tfidf->transform($topJudul_clean);
 
+                //Show table tf-id buat ngetest
                 $i=1;
-                $relatedWord = "";
                 echo "<b>TF-IDF</b><br><br>" ;
                 echo "<table border='1'>";
                 echo "<tr><th align='center'></th>";
@@ -156,19 +156,26 @@
                 }
                 echo "</table><br><br>" ;
 
+                //ambil relatedWord yang besarnya lebih dari 0.5
+                $relatedWord = array();
                 echo "<b>Related Keyword</b>";
                 echo "<br>";
                 for ($i=0; $i < count($topJudul_clean) - 1 ; $i++) { 
                     for ($j=0; $j < count($topJudul_clean[$i])- 1 ; $j++) { 
-                        if ($topJudul_clean[$i][$j] < 0.4 && $topJudul_clean[$i][$j] > 0 ){
-                            $relatedWord .= $vocabulary[$j] . " ";
+                        if ($topJudul_clean[$i][$j] > 0){
+                            $relatedWord[] = ucfirst($vocabulary[$j]);
                         }
                    }
-                    echo $relatedWord;
-                    echo "<br>";
-                    $relatedWord = "";
                 }
 
+                //tampilin hasil Related Keyword
+                $arrSearchWord = explode(" ", $outputStop);
+                echo "<br>";
+                echo  $relatedWord[0] ." ". ucfirst($arrSearchWord[0]) ." ". ucfirst($arrSearchWord[1]);
+                echo "<br>";
+                echo ucfirst($arrSearchWord[0]) ." ". $relatedWord[1] ." ". ucfirst($arrSearchWord[1]);
+                echo "<br>";
+                echo ucfirst($arrSearchWord[0]) ." ". ucfirst($arrSearchWord[1]) ." ". $relatedWord[2];
                 echo "<br>";
                 echo "<table><thead>";
                 echo "<tr><th>News Title</th><th>Similarity Score</th></tr>";
