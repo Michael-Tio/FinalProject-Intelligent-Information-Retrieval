@@ -7,6 +7,27 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Home | Lambe Turah</title>
     <link rel="stylesheet" href="css/style.css">
+    <style>
+        #relatedkeyword a{
+            margin: 5px;
+        }
+
+        #relatedkeyword a:link, #relatedkeyword a:visited {
+            background-color: white;
+            color: #cf4520;
+            border: 2px solid  #cf4520;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            border-radius: 18px;
+        }
+
+        #relatedkeyword  a:hover, #relatedkeyword a:active {
+            background-color: #cf4520;
+            color: white;
+        }
+    </style>
 </head>
 
 <body>
@@ -30,11 +51,11 @@
                     <br>
                     <div>
                         <input type="radio" name="similarity" value="euclidean" 
-                        <?php if (isset($_GET['similarity']) && $_GET['similarity']=="euclidean") echo "checked";?>
-                         required><label for="euclidean">Euclidean</label>
+                            <?php if (isset($_GET['similarity']) && $_GET['similarity']=="euclidean") echo "checked";?>
+                            required><label for="euclidean">Euclidean</label>
                         <input type="radio" name="similarity" value="cosine"
-                        <?php if (isset($_GET['similarity']) && $_GET['similarity']=="cosine") echo "checked";?>
-                        ><label for="cosine">Cosine</label>
+                            <?php if (isset($_GET['similarity']) && $_GET['similarity']=="cosine") echo "checked";?>>
+                            <label for="cosine">Cosine</label>
                     </div>
                 </form>
             </div>
@@ -138,48 +159,64 @@
                 $tfidf->transform($topJudul_clean);
 
                 //Show table tf-id buat ngetest
-                $i=1;
-                echo "<b>TF-IDF</b><br><br>" ;
-                echo "<table border='1'>";
-                echo "<tr><th align='center'></th>";
-                foreach($vocabulary as $term) echo "<th align='center'>".$term."</th>" ;
-                echo "</tr>";
-                foreach($topJudul_clean as $isi){
-                if($i==count($topJudul_clean)) echo "<tr><td>Q</td>" ;
-                else echo "<tr><td>D".$i."</td>" ;
+                // $i=1;
+                // echo "<b>TF-IDF</b><br><br>" ;
+                // echo "<table border='1'>";
+                // echo "<tr><th align='center'></th>";
+                // foreach($vocabulary as $term) echo "<th align='center'>".$term."</th>" ;
+                // echo "</tr>";
+                // foreach($topJudul_clean as $isi){
+                // if($i==count($topJudul_clean)) echo "<tr><td>Q</td>" ;
+                // else echo "<tr><td>D".$i."</td>" ;
 
-                foreach($isi as $item) {
-                    echo "<td>".round($item,1)."</td>";
-                }
-                echo "</tr>" ;
-                $i++;
-                }
-                echo "</table><br><br>" ;
+                // foreach($isi as $item) {
+                //     echo "<td>".round($item,1)."</td>";
+                // }
+                // echo "</tr>" ;
+                // $i++;
+                // }
+                // echo "</table><br><br>" ;
 
                 //ambil relatedWord yang besarnya lebih dari 0.5
                 $relatedWord = array();
                 echo "<b>Related Keyword</b>";
                 echo "<br>";
-                for ($i=0; $i < count($topJudul_clean) - 1 ; $i++) { 
-                    for ($j=0; $j < count($topJudul_clean[$i])- 1 ; $j++) { 
-                        if ($topJudul_clean[$i][$j] > 0){
-                            $relatedWord[] = ucfirst($vocabulary[$j]);
+                for ($i=0; $i < count($topJudul_clean) - 1 ; $i++) {
+                    $topJudulTemp = 0;
+                    $topKeywordTemp = "";
+                    for ($j=0; $j < count($topJudul_clean[$i]) ; $j++) { 
+                        if ($topJudul_clean[$i][$j] > $topJudulTemp){
+                            $topJudulTemp = $topJudul_clean[$i][$j];
+                            $topKeywordTemp = ucfirst($vocabulary[$j]);
                         }
                    }
+                   $relatedWord[] = $topKeywordTemp;
                 }
 
+                echo "<div id='relatedkeyword'>";
                 //tampilin hasil Related Keyword
                 $arrSearchWord = explode(" ", $outputStop);
-                echo "<br>";
-                echo  $relatedWord[0] ." ". ucfirst($arrSearchWord[0]) ." ". ucfirst($arrSearchWord[1]);
-                echo "<br>";
-                echo ucfirst($arrSearchWord[0]) ." ". $relatedWord[1] ." ". ucfirst($arrSearchWord[1]);
-                echo "<br>";
-                echo ucfirst($arrSearchWord[0]) ." ". ucfirst($arrSearchWord[1]) ." ". $relatedWord[2];
-                echo "<br>";
+                if (count($arrSearchWord) == 1){
+                    echo  "<a href='index.php?keyword=$relatedWord[0]"."+".ucfirst($arrSearchWord[0])."&search=Find&similarity=".
+                            $_GET['similarity']."'>".$relatedWord[0] ." ". ucfirst($arrSearchWord[0]) ."</a>";
+                    echo  "<a href='index.php?keyword=".ucfirst($arrSearchWord[0])."+".$relatedWord[1]."&search=Find&similarity=".
+                            $_GET['similarity']."'>".ucfirst($arrSearchWord[0]) ." ". $relatedWord[1] ."</a>";
+                    echo  "<a href='index.php?keyword=".ucfirst($arrSearchWord[0])."+".$relatedWord[2]."&search=Find&similarity=".
+                            $_GET['similarity']."'>".ucfirst($arrSearchWord[0]) ." ". $relatedWord[2]."</a>";
+                }else{
+                    echo  "<a href='index.php?keyword=$relatedWord[0]"."+".ucfirst($arrSearchWord[0])."+".ucfirst($arrSearchWord[1])."&search=Find&similarity=".
+                            $_GET['similarity']."'>".$relatedWord[0] ." ". ucfirst($arrSearchWord[0]) ." ". ucfirst($arrSearchWord[1])."</a>";
+                    echo  "<a href='index.php?keyword=".ucfirst($arrSearchWord[0])."+".$relatedWord[1]."+".ucfirst($arrSearchWord[1])."&search=Find&similarity=".
+                            $_GET['similarity']."'>".ucfirst($arrSearchWord[0]) ." ". $relatedWord[1] ." ". ucfirst($arrSearchWord[1])."</a>";
+                    echo  "<a href='index.php?keyword=".ucfirst($arrSearchWord[0])."+".ucfirst($arrSearchWord[1])."+".$relatedWord[2]."&search=Find&similarity=".
+                            $_GET['similarity']."'>".ucfirst($arrSearchWord[0]) ." ". ucfirst($arrSearchWord[1]) ." ". $relatedWord[2]."</a>";
+                }
+                echo "</div>";
+                
                 echo "<table><thead>";
                 echo "<tr><th>News Title</th><th>Similarity Score</th></tr>";
                 echo "</thead><tbody>";
+       
 
                 for ($i = 0; $i < $jum - 1; $i++) {
                     echo "<tr><td>" . $judul[$i] . "</td>";

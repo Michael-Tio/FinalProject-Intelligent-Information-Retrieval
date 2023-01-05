@@ -10,15 +10,16 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
 keyCNN = sys.argv[1]
+    
 
 path = 'https://unpkg.com/chromedriver@108.0.0/lib/chromedriver.js'
 options = webdriver.ChromeOptions()
 options.add_experimental_option('excludeSwitches', ['enable-logging'])
 driver = webdriver.Chrome(executable_path = path, options = options, service = Service(ChromeDriverManager().install()))
 driver2 = webdriver.Chrome(executable_path = path, options = options, service = Service(ChromeDriverManager().install()))
-driver.get('https://www.google.com/search?q=cnnindonesia.com+' + keyCNN)
+driver.get('https://www.google.com/search?q=cnnindonesia.com+' + keyCNN + '&tbm=nws')
 
-news = driver.find_elements(By.CLASS_NAME, 'MjjYud')
+news = driver.find_elements(By.CLASS_NAME, 'SoaBEf')
 
 newsList = []
 

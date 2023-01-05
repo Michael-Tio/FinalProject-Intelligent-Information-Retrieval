@@ -30,8 +30,12 @@
                     <input type="submit" name="crawl" value="Enter">
                     <br>
                     <div>
-                        <input type="radio" name="news_portal" id="okezone" value="okezone" checked required><label for="okezone">Okezone</label>
-                        <input type="radio" name="news_portal" id="cnn" value="cnn"><label for="cnn">CNN</label>
+                        <input type="radio" name="news_portal" id="okezone" value="okezone" 
+                            <?php if (isset($_POST['news_portal']) && $_POST['news_portal']=="okezone") echo "checked";?>
+                            required><label for="okezone">Okezone</label>
+                        <input type="radio" name="news_portal" id="cnn" value="cnn"
+                            <?php if (isset($_POST['news_portal']) && $_POST['news_portal']=="cnn") echo "checked";?>>
+                            <label for="cnn">CNN</label>
                     </div>
                 </form>
             </div>
@@ -39,6 +43,7 @@
         <section id="result">
             <tbody>
                 <?php
+                set_time_limit(600);
                 require_once __DIR__ . '/vendor/autoload.php';
                 include_once('simple_html_dom.php');
 
