@@ -40,7 +40,7 @@
         </nav>
         <section id="search">
             <div id="title">
-                <h1>Welcome to Berita Lambe Turah</h1>
+                <h1>Home</h1>
             </div>
             <div id="input">
                 <form action="" method="get">
@@ -78,13 +78,14 @@
                 $stopword = $stopwordFactory->createStopWordRemover();
 
                 $i = 0;
-                $sample_data = array();
-                $judul = array();
+       
                 $con = mysqli_connect("localhost", "root", "", "berita");
                 $sql_select = "SELECT * FROM training";
                 $result = mysqli_query($con, $sql_select);
 
+                $judul = array();
                 $similarityArr = array();
+                $sample_data = array();
 
                 $sql = "";
 
@@ -158,7 +159,7 @@
                 $tfidf = new TfIdfTransformer($topJudul_clean);
                 $tfidf->transform($topJudul_clean);
 
-                //Show table tf-id buat ngetest
+                // Show table tf-id buat ngetest
                 // $i=1;
                 // echo "<b>TF-IDF</b><br><br>" ;
                 // echo "<table border='1'>";
@@ -194,7 +195,7 @@
                 }
 
                 echo "<div id='relatedkeyword'>";
-                //tampilin hasil Related Keyword
+                //tampilikan hasil Related Keyword
                 $arrSearchWord = explode(" ", $outputStop);
                 if (count($arrSearchWord) == 1){
                     echo  "<a href='index.php?keyword=$relatedWord[0]"."+".ucfirst($arrSearchWord[0])."&search=Find&similarity=".
@@ -222,16 +223,7 @@
                     echo "<tr><td>" . $judul[$i] . "</td>";
                     echo "<td>" . $similarityArr[$i] . "</td></tr>";
                 }
-                // for($i=0;$i<count($sample_data)-1;$i++) {
-                //     $hasil = 0.0;
-                //     if($_GET['similarity'] == "euclidean"){
-                //         $hasil = $euclidean -> distance($sample_data[$i], $sample_data[0]);
-                //     }else if($_GET['similarity'] == "cosine"){
-                //         $hasil = CosineSimilarity::calc($sample_data[$i], $sample_data[0]);
-                //     }
-                //     echo "<tr><td>".$judul[$i]."</td>";
-                //     echo "<td>" .round($hasil,3)."</td></tr>";
-                // }
+    
                 echo "</tbody></table>";
                 mysqli_close($con);
             }

@@ -109,4 +109,6 @@ nav a.active {
 
 #relatedkeyword{
     display: flex;
+    justify-content: center;
+
 }

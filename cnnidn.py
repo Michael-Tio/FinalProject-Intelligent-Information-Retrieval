@@ -5,9 +5,6 @@ from webdriver_manager.chrome import ChromeDriverManager
 from selenium import *
 import sys
 import json
-import pandas as pd
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
 
 keyCNN = sys.argv[1]
     
@@ -35,8 +32,5 @@ for new in news:
             cnnCategory = driver2.find_element(By.XPATH, '//a[@class="gtm_breadcrumb_kanal"]').text
             if (cnnTitle != '' or cnnDate != '' or cnnCategory != ''):
                 newsList.append([cnnTitle, cnnDate, cnnCategory])
-            # print(cnnTitle)
-            # print(cnnDate)
-            # print(cnnCategory)
 
 print(json.dumps(newsList))

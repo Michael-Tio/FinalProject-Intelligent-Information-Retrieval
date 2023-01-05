@@ -56,29 +56,31 @@
             }
 
             $totalData = count($oriCategory_Arr);
-
-            for ($i = 0; $i < $totalData; $i++) {
-                if ($oriCategory_Arr[$i] == $classificationRes_Arr[$i]) {
-                    $status = "Correct";
-                    $correctCount++;
-                } else {
-                    $status = "Wrong";
-                    $wrongCount++;
+            if($totalData > 0){
+                for ($i = 0; $i < $totalData; $i++) {
+                    if ($oriCategory_Arr[$i] == $classificationRes_Arr[$i]) {
+                        $status = "Correct";
+                        $correctCount++;
+                    } else {
+                        $status = "Wrong";
+                        $wrongCount++;
+                    }
+                    array_push($result_Arr, $status);
+                    echo "<tr>";
+                    echo "<td>" . $title_Arr[$i] . "</td>";
+                    echo "<td>" . $oriCategory_Arr[$i] . "</td>";
+                    echo "<td>" . $classificationRes_Arr[$i] . "</td>";
+                    echo "<td>" . $result_Arr[$i] . "</td>";
+                    echo "</tr>";
                 }
-                array_push($result_Arr, $status);
-                echo "<tr>";
-                echo "<td>" . $title_Arr[$i] . "</td>";
-                echo "<td>" . $oriCategory_Arr[$i] . "</td>";
-                echo "<td>" . $classificationRes_Arr[$i] . "</td>";
-                echo "<td>" . $result_Arr[$i] . "</td>";
-                echo "</tr>";
+    
+                $correctAccuracy = round(($correctCount / $totalData) * 100, 2);
+                $wrongAccuracy = round(($wrongCount / $totalData) * 100, 2);
+                echo "</tbody></table>";
+                
             }
-
-            $correctAccuracy = round(($correctCount / $totalData) * 100, 2);
-            $wrongAccuracy = round(($wrongCount / $totalData) * 100, 2);
-            echo "</tbody></table>";
+    
             ?>
-
             <script type="text/javascript">
                 google.charts.load('current', {
                     'packages': ['corechart']
@@ -103,6 +105,8 @@
                 <h2>Accuracy</h2>
             </div>
             <div id="piechart" style="width: 800px; height: 300px; margin: auto; "></div>
+
+   
         </section>
     </div>
 </body>
