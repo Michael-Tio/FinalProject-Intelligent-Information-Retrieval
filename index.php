@@ -63,7 +63,6 @@
         <section id="result">
             <?php
             require_once __DIR__ . '/vendor/autoload.php';
-            require 'CosineSimilarity.php';
 
             use Phpml\FeatureExtraction\TokenCountVectorizer;
             use Phpml\Tokenization\WhitespaceTokenizer;
