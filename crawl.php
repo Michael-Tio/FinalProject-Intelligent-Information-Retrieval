@@ -35,23 +35,8 @@
                 <?php
                 set_time_limit(600);
                 require_once __DIR__ . '/vendor/autoload.php';
-                include_once('simple_html_dom.php');
                 $con = mysqli_connect("localhost" ,"root" ,"","berita");
                 $sql = "";
-
-
-                function setCURL($url)
-                {
-                    $curl = curl_init();
-                    curl_setopt($curl, CURLOPT_URL, $url);
-                    curl_setopt($curl, CURLOPT_FOLLOWLOCATION, true);
-                    curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-                    curl_setopt($curl, CURLOPT_HEADER, false);
-                    $c_url = curl_exec($curl);
-                    curl_close($curl);
-
-                    return $c_url;
-                }
 
                 if (isset($_POST['crawl'])) {
                     echo "<div id='title'><h3>Crawled Data for '" . $_POST['keyword'] . "'</h3></div>";
